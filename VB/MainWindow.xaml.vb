@@ -36,11 +36,11 @@ Namespace InfiniteAsyncSourceSkipTokenEFSample
             Dim context = New IssuesContext()
             Dim queryable = IssueData.Select(context.Issues).SortBy(e.SortOrder, defaultUniqueSortPropertyName:= defaultUniqueSortProperty).Where(filterExpression)
 
-            Dim issues = queryable.Take(30).ToList()
+            Dim issues = queryable.Take(30).ToArray()
 
             Dim nextSkipToken = SkipTokenHelper.MakeFilterSkipToken(e.SortOrder, defaultUniqueSortProperty, issues.LastOrDefault())
 
-            Return New FetchRowsResult(issues.ToArray(), nextSkipToken:= nextSkipToken)
+            Return New FetchRowsResult(issues, nextSkipToken:= nextSkipToken)
         End Function
     End Class
 End Namespace
