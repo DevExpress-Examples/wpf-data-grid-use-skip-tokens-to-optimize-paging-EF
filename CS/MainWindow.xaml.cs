@@ -40,11 +40,11 @@ namespace InfiniteAsyncSourceSkipTokenEFSample {
 
             var issues = queryable
                 .Take(30)
-                .ToList();
+                .ToArray();
 
             var nextSkipToken = SkipTokenHelper.MakeFilterSkipToken(e.SortOrder, defaultUniqueSortProperty, issues.LastOrDefault());
 
-            return new FetchRowsResult(issues.ToArray(), nextSkipToken: nextSkipToken);
+            return new FetchRowsResult(issues, nextSkipToken: nextSkipToken);
         }
     }
 }
