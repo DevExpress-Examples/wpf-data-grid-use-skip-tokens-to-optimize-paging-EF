@@ -6,41 +6,41 @@ Imports System.Threading.Tasks
 Imports System.Windows
 
 Namespace InfiniteAsyncSourceSkipTokenEFSample
-    Partial Public Class MainWindow
-        Inherits Window
+	Partial Public Class MainWindow
+		Inherits Window
 
-        Public Sub New()
-            InitializeComponent()
+		Public Sub New()
+			InitializeComponent()
 
-            Dim source = New InfiniteAsyncSource() With {.ElementType = GetType(IssueData)}
+			Dim source = New InfiniteAsyncSource() With {.ElementType = GetType(IssueData)}
 
-            AddHandler Unloaded, Sub(o, e)
-                source.Dispose()
-            End Sub
+			AddHandler Me.Unloaded, Sub(o, e)
+				source.Dispose()
+			End Sub
 
-            AddHandler source.FetchRows, Sub(o, e)
-                e.Result = Task.Run(Function() FetchRows(e))
-            End Sub
+			AddHandler source.FetchRows, Sub(o, e)
+				e.Result = Task.Run(Function() FetchRows(e))
+			End Sub
 
-            grid.ItemsSource = source
-        End Sub
+			grid.ItemsSource = source
+		End Sub
 
-        Private Shared Function FetchRows(ByVal e As FetchRowsAsyncEventArgs) As FetchRowsResult
-            Dim filterWithSkipToken = CriteriaOperator.And(e.Filter, CType(e.SkipToken, CriteriaOperator))
+		Private Shared Function FetchRows(ByVal e As FetchRowsAsyncEventArgs) As FetchRowsResult
+			Dim filterWithSkipToken = CriteriaOperator.And(e.Filter, CType(e.SkipToken, CriteriaOperator))
 
-            Dim converter = New GridFilterCriteriaToExpressionConverter(Of IssueData)()
-            Dim filterExpression = converter.Convert(filterWithSkipToken)
+			Dim converter = New GridFilterCriteriaToExpressionConverter(Of IssueData)()
+			Dim filterExpression = converter.Convert(filterWithSkipToken)
 
-            Const defaultUniqueSortProperty As String = "Id"
+			Const defaultUniqueSortProperty As String = "Id"
 
-            Dim context = New IssuesContext()
-            Dim queryable = IssueData.Select(context.Issues).SortBy(e.SortOrder, defaultUniqueSortPropertyName:= defaultUniqueSortProperty).Where(filterExpression)
+			Dim context = New IssuesContext()
+			Dim queryable = IssueData.Select(context.Issues).SortBy(e.SortOrder, defaultUniqueSortPropertyName:= defaultUniqueSortProperty).Where(filterExpression)
 
-            Dim issues = queryable.Take(30).ToArray()
+			Dim issues = queryable.Take(30).ToArray()
 
-            Dim nextSkipToken = SkipTokenHelper.MakeFilterSkipToken(e.SortOrder, defaultUniqueSortProperty, issues.LastOrDefault())
+			Dim nextSkipToken = SkipTokenHelper.MakeFilterSkipToken(e.SortOrder, defaultUniqueSortProperty, issues.LastOrDefault())
 
-            Return New FetchRowsResult(issues, nextSkipToken:= nextSkipToken)
-        End Function
-    End Class
+			Return New FetchRowsResult(issues, nextSkipToken:= nextSkipToken)
+		End Function
+	End Class
 End Namespace
