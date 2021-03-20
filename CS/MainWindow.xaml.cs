@@ -39,7 +39,7 @@ namespace InfiniteAsyncSourceSkipTokenEFSample {
                 .Where(filterExpression);
 
             var issues = queryable
-                .Take(30)
+                .Take(e.Take ?? 30)
                 .ToArray();
 
             var nextSkipToken = SkipTokenHelper.MakeFilterSkipToken(e.SortOrder, defaultUniqueSortProperty, issues.LastOrDefault());
